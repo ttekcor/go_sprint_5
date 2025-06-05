@@ -1,6 +1,7 @@
 package spentenergy
 
 import (
+	"errors"
 	"time"
 )
 
@@ -11,19 +12,41 @@ const (
 	stepLengthCoefficient      = 0.45 // коэффициент для расчета длины шага на основе роста.
 	walkingCaloriesCoefficient = 0.5  // коэффициент для расчета калорий при ходьбе.
 )
+func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
+	// TODO: реализовать функцию
+	if steps == 0 || weight == 0 || height == 0 || duration == 0 {
+		return 0, errors.New("недостаточно данных для подсчёта")
+	} else {
+		result := weight * MeanSpeed(steps, height, duration) * duration.Minutes() / float64(minInH)
+		return result, nil
+	}
+}
 
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	// TODO: реализовать функцию
-}
-
-func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	// TODO: реализовать функцию
-}
-
-func MeanSpeed(steps int, height float64, duration time.Duration) float64 {
-	// TODO: реализовать функцию
+	tmp, err := RunningSpentCalories(steps, weight, height, duration)
+	if err == nil {
+		return tmp * walkingCaloriesCoefficient, nil
+	} else {
+		return 0, err
+	}
 }
 
 func Distance(steps int, height float64) float64 {
 	// TODO: реализовать функцию
+	distanceStep := height * stepLengthCoefficient
+	resultDistance := (distanceStep * float64(steps)) / mInKm
+	return resultDistance
+}
+
+func MeanSpeed(steps int, height float64, duration time.Duration) float64 {
+	// TODO: реализовать функцию
+	if duration > 0 {
+		distanceRes := Distance(steps, height)
+		result := distanceRes / duration.Hours()
+		return result
+	} else {
+		return 0
+	}
+
 }
